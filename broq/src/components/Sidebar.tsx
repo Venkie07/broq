@@ -1,12 +1,16 @@
 import React, { useState } from "react";
 import { MessageSquare, Plus, PanelLeftClose, PanelLeft, Settings, Flame } from "lucide-react";
+import { styles } from "../theme";
 
 interface SidebarProps {
   onClose?: () => void;
+  onOpenSettings?: () => void;
+  theme: "light" | "dark";
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ onClose, onOpenSettings, theme }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const t = styles[theme];
 
   // Mock chat history
   const chats = [
@@ -17,25 +21,40 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
 
   return (
     <div 
-      className={`h-full bg-[#12101A] border-r border-white/5 flex flex-col transition-all duration-300 ${
+      className={`h-full flex flex-col transition-all duration-300 ${
         isCollapsed ? "w-20" : "w-64"
       }`}
+      style={{ backgroundColor: t.sidebarBg, borderRight: `1px solid ${t.border}` }}
     >
       {/* Top Header Area */}
       <div className="p-4 flex items-center justify-between h-16 shrink-0">
         {!isCollapsed && (
           <div className="flex items-center gap-2 group cursor-pointer animate-in fade-in duration-200">
-            <Flame className="text-[#7C3AED] group-hover:text-[#A78BFA] transition-colors drop-shadow-[0_0_8px_rgba(124,58,237,0.5)]" size={24} />
-            <span className="text-lg font-semibold tracking-tight text-[#E5E7EB] group-hover:text-white transition-colors">Broq</span>
+            <Flame 
+              style={{ color: t.primary }} 
+              className="transition-colors drop-shadow-[0_0_8px_rgba(124,58,237,0.5)]" 
+              size={24} 
+              onMouseEnter={(e) => e.currentTarget.style.color = t.primaryHover}
+              onMouseLeave={(e) => e.currentTarget.style.color = t.primary}
+            />
+            <span 
+              className="text-lg font-semibold tracking-tight transition-colors"
+              style={{ color: t.text }}
+            >
+              Broq
+            </span>
           </div>
         )}
         
         {/* Collapse Toggle (Desktop) */}
         <button 
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className={`hidden md:flex p-2 hover:bg-white/10 rounded-lg text-[#9CA3AF] hover:text-white transition-colors ${
+          className={`hidden md:flex p-2 rounded-lg transition-colors duration-200 ${
             isCollapsed ? "mx-auto" : ""
           }`}
+          style={{ color: t.subtext }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = t.text; e.currentTarget.style.backgroundColor = t.hoverBg; }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = t.subtext; e.currentTarget.style.backgroundColor = "transparent"; }}
           title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
         >
           {isCollapsed ? <PanelLeft size={20} /> : <PanelLeftClose size={20} />}
@@ -44,18 +63,34 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
 
       {/* Chat List Area */}
       <div className="flex-1 overflow-y-auto px-3 py-4 space-y-1 custom-scrollbar">
-        {!isCollapsed && <div className="text-xs font-semibold text-[#9CA3AF] mb-3 px-2">Recent</div>}
+        {!isCollapsed && <div className="text-xs font-semibold mb-3 px-2" style={{ color: t.mutedText }}>Recent</div>}
         
         {chats.map((chat) => (
           <button 
             key={chat.id}
             onClick={onClose}
-            className={`w-full flex items-center p-3 rounded-lg hover:bg-white/5 transition-colors group ${
-              chat.id === 1 ? "bg-white/10 text-white" : "text-[#E5E7EB]"
-            } ${isCollapsed ? "justify-center" : "gap-3 text-left"}`}
+            className={`w-full flex items-center p-3 rounded-lg transition-colors duration-200 group ${
+              isCollapsed ? "justify-center" : "gap-3 text-left"
+            }`}
+            style={{ 
+              color: chat.id === 1 ? t.text : t.subtext,
+              backgroundColor: chat.id === 1 ? t.hoverBg : "transparent"
+            }}
+            onMouseEnter={(e) => {
+              if (chat.id !== 1) {
+                e.currentTarget.style.backgroundColor = t.hoverBg;
+                e.currentTarget.style.color = t.text;
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (chat.id !== 1) {
+                e.currentTarget.style.backgroundColor = "transparent";
+                e.currentTarget.style.color = t.subtext;
+              }
+            }}
             title={chat.title}
           >
-            <MessageSquare size={18} className={`shrink-0 ${chat.id === 1 ? "text-[#7C3AED]" : "text-[#9CA3AF] group-hover:text-white"}`} />
+            <MessageSquare size={18} className="shrink-0" style={{ color: chat.id === 1 ? t.primary : "inherit" }} />
             {!isCollapsed && (
               <span className="truncate text-sm font-medium">{chat.title}</span>
             )}
@@ -64,13 +99,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
       </div>
 
       {/* Bottom Area (New Chat & Settings) */}
-      <div className="p-4 border-t border-white/5 flex flex-col gap-2 shrink-0">
+      <div className="p-4 flex flex-col gap-2 shrink-0" style={{ borderTop: `1px solid ${t.border}` }}>
         {/* New Chat Button (Moved lower) */}
         <button 
           onClick={onClose}
-          className={`w-full bg-[#7C3AED] hover:bg-[#6D28D9] hover:scale-[1.02] active:scale-[0.98] text-white rounded-xl flex items-center justify-center transition-all duration-200 ${
+          className={`w-full hover:scale-[1.02] active:scale-[0.98] rounded-xl flex items-center justify-center transition-all duration-200 ${
             isCollapsed ? "p-3" : "py-3 px-4 gap-2"
           }`}
+          style={{ backgroundColor: t.primary, color: "#FFFFFF" }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = t.primaryHover}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = t.primary}
           title="New Chat"
         >
           <Plus size={20} className="shrink-0" />
@@ -78,9 +116,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
         </button>
 
         <button 
-          className={`w-full flex items-center text-[#9CA3AF] hover:text-white hover:bg-white/5 rounded-lg transition-colors ${
+          onClick={onOpenSettings}
+          className={`w-full flex items-center rounded-xl transition-colors duration-200 ${
             isCollapsed ? "justify-center p-3" : "gap-3 p-3 text-left"
           }`}
+          style={{ color: t.subtext, border: `1px solid ${t.border}` }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = t.text; e.currentTarget.style.backgroundColor = t.hoverBg; }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = t.subtext; e.currentTarget.style.backgroundColor = "transparent"; }}
           title="Settings"
         >
           <Settings size={20} className="shrink-0" />

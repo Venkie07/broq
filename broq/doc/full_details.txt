@@ -1,0 +1,61 @@
+# Broq Chat UI – Internal Documentation
+
+## UI Architecture
+- **MainLayout**: Wraps the chat interface, sidebar, and header for a cohesive layout.
+- **ChatWindow**: Displays the conversation, handles message rendering, and scrolls to the latest message.
+- **ChatInput**: Handles user input, file uploads, and message sending.
+- **Sidebar/Header**: Navigation and branding elements.
+
+## Component Structure
+- **components/ChatInput.tsx**: Input area, file upload (drag & drop + attachment button), send button, file preview.
+- **components/MessageBubble.tsx**: Renders individual messages with proper styling, copy-to-clipboard, and overflow handling.
+- **hooks/useChat.ts**: Manages chat state, message list, and sending logic.
+- **hooks/useDragAndDrop.ts**: Encapsulates drag-and-drop logic for file uploads.
+
+## State Handling
+- **ChatInput**: Local state for input value and file list. Uses props to communicate with parent (onSendMessage, removeFile, clearFiles).
+- **useChat**: Centralizes chat messages and API calls.
+- **useDragAndDrop**: Handles drag events, file validation, and state updates.
+
+## File Upload Logic
+- **Drag & Drop**: Users drag files onto the chat area. Files are previewed and can be removed before sending. Uses `useDragAndDrop` for event handling.
+- **Attachment Button**: Paperclip button triggers a hidden `<input type="file">` via `useRef`. File selection uses the same handler as drag-and-drop, ensuring unified logic and no code duplication.
+- **Single & Multiple Files**: Both methods support multiple file selection if enabled.
+
+## Known Issues Fixed
+- **Attachment button not working**: Now triggers the file picker and routes files to the same handler as drag-and-drop.
+- **Text overflow issues**: Message bubbles now use `break-words`, `overflow-hidden`, and `max-w-*` classes to prevent horizontal overflow and ensure proper wrapping.
+
+## Design Decisions
+- **Max-width constraints**: Prevents chat bubbles from stretching too wide, improving readability and mimicking ChatGPT's layout.
+- **break-words**: Ensures long words, URLs, and code do not break the layout.
+
+## Suggestions for Future Enhancements
+- File preview UI for images, PDFs, etc.
+- Upload progress bar for large files
+- Backend integration for persistent chat and file storage
+- Markdown rendering for rich message formatting
+- Accessibility improvements (ARIA labels, keyboard navigation)
+
+---
+
+## Debugging Insights
+
+- **Why files were inconsistent:**
+	- Multiple file states (draggedFiles, local state, etc.) led to confusion and race conditions.
+	- State updates were not always functional, causing stale state bugs.
+	- File input was not reset, so selecting the same file twice did not trigger UI updates.
+
+## Architecture Fix
+
+- Centralized file handler: Both drag-and-drop and attachment button now use a single handler and state.
+- Shared state: Only one `files` state is used, always updated functionally.
+- File input is always reset after use.
+- File chips use stable keys for rendering.
+
+## Future Improvements
+- Upload progress indicator for each file
+- File type icons (image, PDF, etc.)
+- File preview (image/pdf inline)
+
+---

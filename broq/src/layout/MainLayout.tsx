@@ -1,37 +1,56 @@
+
 import React, { useState } from "react";
 import { Sidebar } from "../components/Sidebar";
 import { Header } from "../components/Header";
 import { CloudUpload } from "lucide-react";
+import { styles } from "../theme";
 
 interface MainLayoutProps {
   children: React.ReactNode;
   isDragging?: boolean;
+  theme?: "light" | "dark";
+  onOpenSettings?: () => void;
 }
 
-export const MainLayout: React.FC<MainLayoutProps> = ({ children, isDragging }) => {
+
+export const MainLayout: React.FC<MainLayoutProps> = ({ children, isDragging, theme = "dark", onOpenSettings }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
   return (
-    <div className="flex h-screen w-full bg-[#0B0A10] text-[#E5E7EB] overflow-hidden relative">
+    <div
+      className="flex h-screen w-full overflow-hidden relative"
+      style={{
+        backgroundColor: styles[theme].bg,
+        color: styles[theme].text,
+      }}
+    >
       {/* Global Drag Overlay */}
-      <div 
-        className={`fixed inset-0 z-[100] bg-black/60 backdrop-blur-lg flex items-center justify-center transition-all duration-300 pointer-events-none ${
+      <div
+        className={`fixed inset-0 z-[100] backdrop-blur-lg flex items-center justify-center transition-all duration-300 pointer-events-none ${
           isDragging ? "opacity-100 scale-100" : "opacity-0 scale-95"
         }`}
+        style={{ backgroundColor: "rgba(0, 0, 0, 0.6)" }}
       >
-        <div className="w-full max-w-2xl mx-4 aspect-video rounded-3xl border-2 border-dashed border-[#7C3AED] bg-[#12101A]/80 flex flex-col items-center justify-center shadow-2xl">
-          <CloudUpload className="text-[#7C3AED] w-20 h-20 mb-6 animate-bounce" style={{ animationDuration: '2s' }} />
-          <h2 className="text-3xl font-bold text-white mb-3">Drop files to attach</h2>
-          <p className="text-[#9CA3AF] text-lg">Your files will be uploaded securely</p>
+        <div
+          className="w-full max-w-2xl mx-4 aspect-video rounded-3xl border-2 border-dashed flex flex-col items-center justify-center shadow-2xl"
+          style={{
+            borderColor: styles[theme].primary,
+            backgroundColor: styles[theme].card,
+          }}
+        >
+          <CloudUpload className="hidden md:block" style={{ color: styles[theme].primary, width: 80, height: 80, marginBottom: 24, animation: 'bounce 2s infinite' }} />
+          <h2 className="text-3xl font-bold mb-3" style={{ color: styles[theme].text }}>Drop files to attach</h2>
+          <p className="text-lg" style={{ color: styles[theme].mutedText }}>Your files will be uploaded securely</p>
         </div>
       </div>
 
       {/* Mobile overlay */}
       {isSidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity"
+        <div
+          className="fixed inset-0 z-40 md:hidden transition-opacity"
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
@@ -42,12 +61,15 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children, isDragging }) 
           isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         }`}
       >
-        <Sidebar onClose={() => setIsSidebarOpen(false)} />
+        <Sidebar onClose={() => setIsSidebarOpen(false)} onOpenSettings={onOpenSettings} theme={theme} />
       </div>
 
       {/* Main chat section */}
-      <div className="flex-1 flex flex-col h-full min-w-0 bg-[#0F0D17]">
-        <Header onToggleSidebar={toggleSidebar} />
+      <div
+        className="flex-1 flex flex-col h-full min-w-0"
+        style={{ backgroundColor: styles[theme].bg }}
+      >
+        <Header onToggleSidebar={toggleSidebar} theme={theme} />
         <main className="flex-1 overflow-hidden flex flex-col relative">
           {children}
         </main>
