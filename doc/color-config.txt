@@ -1,0 +1,39 @@
+# Broq Chat UI - Color Configuration
+
+The application uses a centralized theme object defined in `src/theme.ts`. To ensure that both the light and dark themes are perfectly consistent across the UI, all color styles are enforced via inline React styles rather than Tailwind utility classes (`text-*`, `bg-*`, `border-*`).
+
+## Theme Variables Overview
+
+- **`bg`**: Main application background color. Used in `App.tsx` and main layout wrappers.
+- **`text`**: Primary text color. Used for standard paragraph and heading text.
+- **`card`**: Background color for distinct card-like elements (e.g. Settings option buttons).
+- **`primary`**: Main accent color, primarily used for icons, active buttons, and user chat bubbles.
+- **`primaryHover`**: Hover state color for the primary accent elements.
+- **`border`**: Border color used for lines dividing elements (e.g., sidebar, header, chat input).
+- **`sidebarBg`**: Background color specifically used for the Sidebar.
+- **`inputBg`**: Background color for the Chat Input area.
+- **`subtext`**: Secondary text color used for inactive icons or lesser prominent text.
+- **`hoverBg`**: Background color for hovered elements that shouldn't use the primary color (e.g. Sidebar list items, transparent icon buttons).
+- **`mutedText`**: Text color for placeholders, sub-labels, and disabled-looking text.
+
+## How to update a color
+Open `src/theme.ts` and modify the hex values under the `light` or `dark` object. The UI will instantly reflect the changes.
+
+Example:
+```typescript
+export const styles: Record<"light" | "dark", ThemeColors> = {
+  light: {
+    primary: "#YOUR_NEW_COLOR",
+    // ...
+  },
+  dark: {
+    primary: "#YOUR_NEW_COLOR_DARK",
+    // ...
+  }
+}
+```
+
+## How to add a new color token
+1. Add the token to the `ThemeColors` type in `src/theme.ts`.
+2. Provide a default value for both the `light` and `dark` objects.
+3. Access it in your component using `const t = styles[activeTheme]; style={{ color: t.newToken }}`.
