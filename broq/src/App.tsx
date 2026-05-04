@@ -6,6 +6,9 @@ import { useDragAndDrop } from "./hooks/useDragAndDrop";
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { styles } from "./theme";
 import Settings from "./components/settings";
+import Plugins from "./components/Plugins";
+import Links from "./components/Links";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 
 // Theme context
@@ -35,7 +38,6 @@ function getSystemTheme() {
 const App: React.FC = () => {
   const { messages, isLoading, sendMessage } = useChat();
   const { isDragging } = useDragAndDrop();
-  const [view, setView] = useState<"chat" | "settings">("chat");
   const [theme, setTheme] = useState<ThemeType>(() => {
     const saved = localStorage.getItem("broq-theme");
     return (saved as ThemeType) || "system";
@@ -59,6 +61,7 @@ const App: React.FC = () => {
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme, activeTheme }}>
+      <BrowserRouter>
       <div
         className="transition-colors duration-300"
         style={{
@@ -67,29 +70,31 @@ const App: React.FC = () => {
           minHeight: "100vh",
         }}
       >
-        {view === "chat" ? (
-          <MainLayout isDragging={isDragging} theme={activeTheme} onOpenSettings={() => setView("settings")}>
-            <ChatWindow messages={messages} isLoading={isLoading} />
-              <div
-                className="shrink-0 pt-6 pb-2"
-                style={{
-                  background: `linear-gradient(to top, ${styles[activeTheme].bg} 60%, transparent)`
-                }}
-              >
-              <ChatInput
-                onSendMessage={sendMessage}
-                disabled={isLoading}
-              />
-            </div>
-          </MainLayout>
-        ) : (
-          <Settings 
-            theme={theme} 
-            setTheme={setTheme} 
-            onBack={() => setView("chat")} 
-          />
-        )}
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <MainLayout isDragging={isDragging} theme={activeTheme}>
+                  <ChatWindow messages={messages} isLoading={isLoading} />
+                  <ChatInput onSendMessage={sendMessage} disabled={isLoading} />
+                </MainLayout>
+              }
+            />
+            <Route
+              path="/settings"
+              element={<Settings theme={theme} setTheme={setTheme} onBack={() => window.history.length > 1 ? window.history.back() : window.location.assign('/')} />}
+            />
+            <Route
+              path="/plugins"
+              element={<Plugins onBack={() => window.history.length > 1 ? window.history.back() : window.location.assign('/')} />}
+            />
+            <Route
+              path="/links"
+              element={<Links onBack={() => window.history.length > 1 ? window.history.back() : window.location.assign('/')} />}
+            />
+          </Routes>
       </div>
+      </BrowserRouter>
     </ThemeContext.Provider>
   );
 };

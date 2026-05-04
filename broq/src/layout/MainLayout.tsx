@@ -9,11 +9,9 @@ interface MainLayoutProps {
   children: React.ReactNode;
   isDragging?: boolean;
   theme?: "light" | "dark";
-  onOpenSettings?: () => void;
 }
 
-
-export const MainLayout: React.FC<MainLayoutProps> = ({ children, isDragging, theme = "dark", onOpenSettings }) => {
+export const MainLayout: React.FC<MainLayoutProps> = ({ children, isDragging, theme = "dark" }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
@@ -61,7 +59,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children, isDragging, th
           isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         }`}
       >
-        <Sidebar onClose={() => setIsSidebarOpen(false)} onOpenSettings={onOpenSettings} theme={theme} />
+        <Sidebar onClose={() => setIsSidebarOpen(false)} theme={theme} />
       </div>
 
       {/* Main chat section */}
